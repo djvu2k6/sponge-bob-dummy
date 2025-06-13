@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Krusty Cook Academy - SpongeBob's Cooking School</title>
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --sea-blue: #00BFFF;
+            --sponge-yellow: #FFEB3B;
+            --coral: #FF6B6B;
+            --light-aqua: #7FDBFF;
+            --white: #FFFFFF;
+            --navy: #001F3F;
+        }
+
+        body {
+            font-family: 'Baloo 2', cursive;
+            background: linear-gradient(135deg, var(--sea-blue), var(--light-aqua));
+            overflow-x: hidden;
+            cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><circle cx="10" cy="10" r="8" fill="%23FFEB3B" stroke="%2300BFFF" stroke-width="2"/><circle cx="7" cy="7" r="1" fill="%23001F3F"/><circle cx="13" cy="7" r="1" fill="%23001F3F"/><path d="M6 13 Q10 16 14 13" stroke="%23001F3F" stroke-width="1.5" fill="none"/></svg>') 10 10, auto;
+            padding-top: 70px; /* Prevent content from hiding under nav */
+        }
+
+        /* Nav Bar Styles */
+        .main-nav {
+            width: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 10;
+            background: rgba(0, 31, 63, 0.85); /* var(--navy) with opacity */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 5%;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+            backdrop-filter: blur(6px);
+        }
+
+        .nav-logo {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--sponge-yellow);
+            text-shadow: 1px 1px 0 var(--coral);
+            letter-spacing: 1px;
+        }
+
+        .nav-links {
+            list-style: none;
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: var(--white);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: color 0.2s;
+            padding: 0.3rem 0.7rem;
+            border-radius: 20px;
+        }
+
+        .nav-links a:hover {
+            background: var(--coral);
+            color: var(--sponge-yellow);
+        }
+
+        /* Bubbles Background Animation */
+        .bubbles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .bubble {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            animation: float 6s infinite ease-in-out;
+        }
+
+        .bubble:nth-child(1) { left: 10%; width: 20px; height: 20px; animation-delay: 0s; }
+        .bubble:nth-child(2) { left: 20%; width: 30px; height: 30px; animation-delay: 1s; }
+        .bubble:nth-child(3) { left: 35%; width: 15px; height: 15px; animation-delay: 2s; }
+        .bubble:nth-child(4) { left: 50%; width: 25px; height: 25px; animation-delay: 3s; }
+        .bubble:nth-child(5) { left: 70%; width: 18px; height: 18px; animation-delay: 4s; }
+        .bubble:nth-child(6) { left: 85%; width: 22px; height: 22px; animation-delay: 5s; }
+
+        @keyframes float {
+            0% { bottom: -20px; opacity: 0; transform: translateX(0px) rotate(0deg); }
+            50% { opacity: 1; transform: translateX(30px) rotate(180deg); }
+            100% { bottom: 100vh; opacity: 0; transform: translateX(-30px) rotate(360deg); }
+        }
+
+        /* Hero Section */
+        .hero {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 5%;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-content {
+            flex: 1;
+            max-width: 600px;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 800;
+            color: var(--sponge-yellow);
+            text-shadow: 3px 3px 0 var(--navy);
+            margin-bottom: 1rem;
+            line-height: 1.1;
+        }
+
+        .hero h2 {
+            font-size: clamp(1.2rem, 3vw, 2rem);
+            color: var(--white);
+            text-shadow: 2px 2px 0 var(--navy);
+            margin-bottom: 2rem;
+            max-width: 100%;
+            white-space: normal;
+        }
+
+        .typing-text {
+            white-space: nowrap;
+            overflow: hidden;
+            max-width: 100vw;
+        }
+
+        .cta-button {
+            background: linear-gradient(45deg, var(--coral), #FF8E8E);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            font-size: 1.2rem;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            transform: scale(1);
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            box-shadow: 0 8px 20px rgba(255, 107, 107, 0.3);
+        }
+
+        .cta-button:hover {
+            transform: scale(1.05) rotate(-2deg);
+            box-shadow: 0 12px 30px rgba(255, 107, 107, 0.4);
+        }
+
+        .hero-image {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .spongebob-hero {
+            width: 350px;
+            height: 400px;
+            background: var(--sponge-yellow);
+            border-radius: 20px;
+            position: relative;
+            animation: bob 3s ease-in-out infinite;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        @keyframes bob {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(2deg); }
+        }
+
+        /* Eyes */
+        .spongebob-hero::before,
+        .spongebob-hero::after {
+            content: '';
+            position: absolute;
+            width: 60px;
+            height: 80px;
+            background: white;
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            top: 80px;
+            border: 3px solid var(--navy);
+        }
+
+        .spongebob-hero::before { left: 60px; }
+        .spongebob-hero::after { right: 60px; }
+
+        /* Section Styling */
+        section {
+            padding: 5rem 5%;
+            position: relative;
+            z-index: 2;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 700;
+            color: var(--sponge-yellow);
+            text-shadow: 2px 2px 0 var(--navy);
+            margin-bottom: 3rem;
+        }
+
+        /* About Section */
+        .about {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 30px;
+            margin: 2rem 0;
+        }
+
+        .about-content {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 3rem;
+            align-items: center;
+        }
+
+        .about-text p {
+            font-size: 1.2rem;
+            color: var(--white);
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .skills-list {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .skills-list li {
+            background: var(--coral);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-weight: 600;
+            transform: rotate(-2deg);
+            transition: transform 0.3s ease;
+        }
+
+        .skills-list li:hover {
+            transform: rotate(2deg) scale(1.1);
+        }
+
+        .about-image {
+            width: 250px;
+            height: 300px;
+            background: var(--sponge-yellow);
+            border-radius: 15px;
+            margin: 0 auto;
+            animation: wiggle 4s ease-in-out infinite;
+        }
+
+        @keyframes wiggle {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(2deg); }
+            75% { transform: rotate(-2deg); }
+        }
+
+        /* Classes Section */
+        .classes {
+            text-align: center;
+        }
+
+        .classes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .class-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(15px);
+            border-radius: 25px;
+            padding: 2rem;
+            transform: translateY(50px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .class-card:hover {
+            transform: translateY(-10px) rotate(1deg);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .class-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .class-card h3 {
+            font-size: 1.5rem;
+            color: var(--sponge-yellow);
+            margin-bottom: 1rem;
+            text-shadow: 1px 1px 0 var(--navy);
+        }
+
+        .class-card p {
+            color: var(--white);
+            line-height: 1.5;
+        }
+
+        /* Testimonials */
+        .testimonials {
+            background: rgba(255, 235, 59, 0.1);
+            border-radius: 30px;
+            margin: 2rem 0;
+        }
+
+        .testimonial-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .testimonial-card {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: center;
+            transform: scale(0.8);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .testimonial-card:hover {
+            transform: scale(1.05) rotate(-1deg);
+        }
+
+        .character-emoji {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .testimonial-text {
+            font-style: italic;
+            color: var(--white);
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .character-name {
+            font-weight: 600;
+            color: var(--sponge-yellow);
+            text-shadow: 1px 1px 0 var(--navy);
+        }
+
+        /* Contact Section */
+        .contact {
+            text-align: center;
+            background: linear-gradient(45deg, var(--coral), var(--light-aqua));
+            border-radius: 30px;
+            color: white;
+        }
+
+        .contact-form {
+            max-width: 500px;
+            margin: 2rem auto;
+            display: grid;
+            gap: 1rem;
+        }
+
+        .contact-form input {
+            padding: 1rem;
+            border: none;
+            border-radius: 15px;
+            font-size: 1rem;
+            font-family: inherit;
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .contact-form input:focus {
+            outline: 3px solid var(--sponge-yellow);
+            transform: scale(1.02);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .hero {
+                flex-direction: column;
+                text-align: center;
+                padding: 2rem 5%;
+            }
+
+            .hero-content {
+                margin-bottom: 2rem;
+            }
+
+            .spongebob-hero {
+                width: 250px;
+                height: 300px;
+            }
+
+            .about-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .skills-list {
+                justify-content: center;
+            }
+
+            .nav-links {
+                flex-direction: column;
+                gap: 1rem;
+                position: absolute;
+                top: 60px;
+                right: 5%;
+                background: rgba(255, 255, 255, 0.9);
+                border-radius: 10px;
+                padding: 1rem;
+                display: none;
+                width: 200px;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .nav-toggle {
+                display: flex;
+                flex-direction: column;
+                cursor: pointer;
+            }
+
+            .nav-toggle div {
+                width: 25px;
+                height: 3px;
+                background: var(--navy);
+                margin: 4px 0;
+                transition: all 0.3s ease;
+            }
+
+            .nav-toggle.active div:nth-child(1) {
+                transform: rotate(45deg) translate(5px, 5px);
+            }
+
+            .nav-toggle.active div:nth-child(2) {
+                opacity: 0;
+            }
+
+            .nav-toggle.active div:nth-child(3) {
+                transform: rotate(-45deg) translate(5px, -5px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="main-nav">
+        <div class="nav-logo">🍔 Krusty Cook Academy</div>
+        <ul class="nav-links">
+            <li><a href="#about">About</a></li>
+            <li><a href="#classes">Classes</a></li>
+            <li><a href="#testimonials">Testimonials</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+    </nav>
+    <!-- Animated Bubbles Background -->
+    <div class="bubbles">
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+    </div>
+
+    
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Cooking with a Smile (Under the Sea!)</h1>
+            <h2 class="typing-text">Master the Krabby Patty from Bikini Bottom's #1 Fry Cook.</h2>
+            <a href="#contact" class="cta-button">Book a Cooking Class</a>
+        </div>
+        <div class="hero-image">
+            <img src="hero.jpg" alt="spongebob hero image" class="spongebob-hero">
+            <!--div class="spongebob-hero"></div-->
+        </div>
+    </section>
+
+    
+
+    <!-- About Section -->
+    <section class="about" id="about">
+        <h2 class="section-title">Meet SpongeBob</h2>
+        <div class="about-content">
+            <div class="about-text">
+                <p>Ahoy there! I'm SpongeBob SquarePants, the happiest fry cook in all of Bikini Bottom! When I'm not flipping patties at the Krusty Krab, I'm sharing my love of cooking with fellow sea creatures at my very own Krusty Cook Academy!</p>
+                <p>With years of experience making the most delicious Krabby Patties and a heart full of enthusiasm, I'm here to teach you the secrets of underwater cuisine. Every dish is made with love, laughter, and a splash of jellyfish jelly!</p>
+                <ul class="skills-list">
+                    <li>🍔 Perfect Patty Flipping</li>
+                    <li>🎵 Singing While Cooking</li>
+                    <li>🔥 Grill Mastery</li>
+                    <li>💛 Spreading Joy</li>
+                    <li>🌊 Underwater Techniques</li>
+                </ul>
+            </div>
+            <div class="about-image">
+                <img src="download.jpeg" alt="SpongeBob SquarePants" class="about-image">
+                <!--div class="about-image"></div-->
+            </div>
+        </div>
+    </section>
+
+    <!-- Classes Section -->
+    <section class="classes" id="classes">
+        <h2 class="section-title">Classes Offered</h2>
+        <div class="classes-grid">
+            <div class="class-card">
+                <div class="class-icon">🍔</div>
+                <h3>Krabby Patty Masterclass</h3>
+                <p>Learn the secret technique behind Bikini Bottom's most famous burger! From perfect patty formation to secret sauce mixing, become a true Krabby Patty master.</p>
+            </div>
+            <div class="class-card">
+                <div class="class-icon">🍳</div>
+                <h3>Underwater Omelets</h3>
+                <p>Discover how to cook fluffy, delicious omelets even under the sea! Master the art of underwater egg preparation with SpongeBob's special techniques.</p>
+            </div>
+            <div class="class-card">
+                <div class="class-icon">🍰</div>
+                <h3>Jellyfish Jelly Desserts</h3>
+                <p>Create sweet, wobbly desserts using the finest jellyfish jelly! Learn to catch, extract, and incorporate this delicious ingredient into amazing treats.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="testimonials" id="testimonials">
+        <h2 class="section-title">What Students Say</h2>
+        <div class="testimonial-grid">
+            <div class="testimonial-card">
+                <div class="character-emoji">⭐</div>
+                <p class="testimonial-text">"SpongeBob taught me how to make a Krabby Patty! Now I can eat them whenever I want! Best friend and best teacher ever!"</p>
+                <div class="character-name">- Patrick Star</div>
+            </div>
+            <div class="testimonial-card">
+                <div class="character-emoji">🎭</div>
+                <p class="testimonial-text">"I hate to admit it, but SpongeBob actually knows what he's doing in the kitchen. The classes are... tolerable."</p>
+                <div class="character-name">- Squidward Tentacles</div>
+            </div>
+            <div class="testimonial-card">
+                <div class="character-emoji">💰</div>
+                <p class="testimonial-text">"That boy SpongeBob knows how to turn ingredients into MONEY! I mean... delicious food! Ar ar ar ar!"</p>
+                <div class="character-name">- Mr. Krabs</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="contact" id="contact">
+        <h2 class="section-title">Ready to Flip Your Skills?</h2>
+        <p style="font-size: 1.2rem; margin-bottom: 2rem;">Join the Krusty Cook Academy and start your underwater culinary adventure today!</p>
+        
+        <form class="contact-form">
+            <input type="text" placeholder="Your Name (e.g., Gary the Snail)" required>
+            <input type="email" placeholder="Your Email" required>
+            <input type="text" placeholder="Your Favorite Food (e.g., Krabby Patty)" required>
+            <button type="submit" class="cta-button">Join the Krusty Cook Academy</button>
+        </form>
+    </section>
+
+    <script>
+        // Register ScrollTrigger plugin
+        gsap.registerPlugin(ScrollTrigger);
+
+        // Typing Animation
+        const text = "Master the Krabby Patty from Bikini Bottom's #1 Fry Cook.";
+        const typingElement = document.querySelector('.typing-text');
+        let i = 0;
+
+        function typeWriter() {
+            if (i < text.length) {
+                typingElement.innerHTML = text.substring(0, i + 1);
+                i++;
+                setTimeout(typeWriter, 50);
+            }
+        }
+
+        // Start typing animation after a delay
+        setTimeout(typeWriter, 1000);
+
+        // Hero animations
+        gsap.from('.hero-content h1', {
+            duration: 1,
+            y: 100,
+            opacity: 0,
+            ease: "bounce.out"
+        });
+
+        gsap.from('.hero-content .cta-button', {
+            duration: 1,
+            scale: 0,
+            opacity: 0,
+            delay: 2,
+            ease: "back.out(1.7)"
+        });
+
+        gsap.from('.spongebob-hero', {
+            duration: 1.5,
+            x: 200,
+            opacity: 0,
+            delay: 0.5,
+            ease: "elastic.out(1, 0.3)"
+        });
+
+        // About section animations
+        gsap.from('.about-text', {
+            scrollTrigger: {
+                trigger: '.about',
+                start: 'top 80%'
+            },
+            duration: 1,
+            x: -100,
+            opacity: 0,
+            ease: "power2.out"
+        });
+
+        gsap.from('.about-image', {
+            scrollTrigger: {
+                trigger: '.about',
+                start: 'top 80%'
+            },
+            duration: 1,
+            x: 100,
+            opacity: 0,
+            delay: 0.3,
+            ease: "power2.out"
+        });
+
+        // Skills animation
+        gsap.from('.skills-list li', {
+            scrollTrigger: {
+                trigger: '.skills-list',
+                start: 'top 90%'
+            },
+            duration: 0.6,
+            y: 30,
+            opacity: 0,
+            stagger: 0.1,
+            ease: "back.out(1.7)"
+        });
+
+        // Classes cards animation
+        gsap.to('.class-card', {
+            scrollTrigger: {
+                trigger: '.classes-grid',
+                start: 'top 80%'
+            },
+            duration: 0.8,
+            y: 0,
+            opacity: 1,
+            stagger: 0.2,
+            ease: "power2.out"
+        });
+
+        // Testimonials animation
+        gsap.to('.testimonial-card', {
+            scrollTrigger: {
+                trigger: '.testimonial-grid',
+                start: 'top 80%'
+            },
+            duration: 0.8,
+            scale: 1,
+            opacity: 1,
+            stagger: 0.15,
+            ease: "back.out(1.7)"
+        });
+
+        // Contact form animation
+        gsap.from('.contact-form', {
+            scrollTrigger: {
+                trigger: '.contact',
+                start: 'top 80%'
+            },
+            duration: 1,
+            y: 50,
+            opacity: 0,
+            ease: "power2.out"
+        });
+
+        // Add wobble effect to buttons on hover
+        document.querySelectorAll('.cta-button').forEach(button => {
+            button.addEventListener('mouseenter', () => {
+                gsap.to(button, {
+                    duration: 0.6,
+                    rotation: 5,
+                    scale: 1.1,
+                    ease: "elastic.out(1, 0.3)"
+                });
+            });
+
+            button.addEventListener('mouseleave', () => {
+                gsap.to(button, {
+                    duration: 0.6,
+                    rotation: 0,
+                    scale: 1,
+                    ease: "elastic.out(1, 0.3)"
+                });
+            });
+        });
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    gsap.to(window, {
+                        duration: 1,
+                        scrollTo: target,
+                        ease: "power2.inOut"
+                    });
+                }
+            });
+        });
+
+        // Form submission handler
+        document.querySelector('.contact-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Add fun animation
+            gsap.to(this, {
+                duration: 0.5,
+                scale: 0.95,
+                yoyo: true,
+                repeat: 1,
+                ease: "power2.inOut"
+            });
+
+            // Show success message
+            setTimeout(() => {
+                alert("Barnacles! Thanks for signing up! SpongeBob will contact you faster than you can say 'Krabby Patty'! 🍔");
+            }, 1000);
+        });
+
+        // Parallax effect for bubbles
+        gsap.to('.bubble', {
+            y: -100,
+            duration: 2,
+            ease: "power1.inOut",
+            stagger: 0.5,
+            repeat: -1,
+            yoyo: true
+        });
+
+        // Add floating animation to section titles
+        gsap.to('.section-title', {
+            y: -10,
+            duration: 2,
+            ease: "sine.inOut",
+            repeat: -1,
+            yoyo: true,
+            stagger: 0.3
+        });
+    </script>
+</body>
+</html>
